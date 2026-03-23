@@ -1,5 +1,7 @@
+use crate::category::FileCategory;
 use serde::Serialize;
 use std::collections::HashMap;
+use std::path::Path;
 
 /// Intermediate tree node for building the hierarchy from filesystem paths.
 ///
@@ -14,6 +16,12 @@ pub struct DirNode {
     pub file_count: usize,
 }
 
+/// ECharts itemStyle for setting per-node colors.
+#[derive(Debug, Serialize)]
+pub struct EChartsItemStyle {
+    pub color: FileCategory,
+}
+
 /// JSON-serializable tree node for ECharts treemap visualization.
 #[derive(Debug, Serialize)]
 pub struct EChartsNode {
@@ -22,6 +30,8 @@ pub struct EChartsNode {
     pub value: Option<u64>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub children: Vec<EChartsNode>,
+    #[serde(rename = "itemStyle", skip_serializing_if = "Option::is_none")]
+    pub item_style: Option<EChartsItemStyle>,
 }
 
 impl DirNode {
@@ -75,11 +85,13 @@ impl DirNode {
     /// a single node named `"a/b/c"`) to reduce visual clutter.
     pub fn to_echarts(&self, name: &str) -> EChartsNode {
         if self.children.is_empty() {
-            // Leaf
+            // Leaf — color by file category
+            let category = FileCategory::from_path(Path::new(name));
             return EChartsNode {
                 name: name.to_string(),
                 value: Some(self.file_size),
                 children: Vec::new(),
+                item_style: Some(EChartsItemStyle { color: category }),
             };
         }
 
@@ -104,6 +116,7 @@ impl DirNode {
                 name: collapsed_name,
                 value: child.value,
                 children: child.children,
+                item_style: None,
             };
         }
 
@@ -111,6 +124,7 @@ impl DirNode {
             name: name.to_string(),
             value: None,
             children,
+            item_style: None,
         }
     }
 }

@@ -202,3 +202,100 @@ fn to_echarts____directory_subtrees_sorted_by_total_size____largest_first() {
     // At least verify we have 3 top-level entries
     assert_eq!(echarts_children.len(), 3);
 }
+
+// --- Property-based tests ---
+
+use proptest::prelude::*;
+
+/// Generate a random list of (path, size) pairs for property testing.
+fn arb_file_list() -> impl Strategy<Value = Vec<(String, u64)>> {
+    let dir_names = prop::collection::vec("[a-z]{1,4}", 1..=4);
+    let file_name = "[a-z]{1,6}\\.[a-z]{1,3}";
+    let size = 0u64..10_000_000;
+
+    prop::collection::vec((dir_names, file_name, size), 0..50).prop_map(|entries| {
+        entries
+            .into_iter()
+            .map(|(dirs, name, sz)| {
+                let path = format!("/{}/{}", dirs.join("/"), name);
+                (path, sz)
+            })
+            .collect()
+    })
+}
+
+/// Helper: compute the total size of an EChartsNode subtree.
+fn echarts_total_size(node: &EChartsNode) -> u64 {
+    if let Some(val) = node.value {
+        val
+    } else {
+        node.children.iter().map(echarts_total_size).sum()
+    }
+}
+
+proptest! {
+    #[test]
+    fn prop____total_size_equals_sum_of_file_sizes(files in arb_file_list()) {
+        let refs: Vec<(&str, u64)> = files.iter().map(|(p, s)| (p.as_str(), *s)).collect();
+        let tree = build_tree(&refs);
+        let expected: u64 = files.iter().map(|(_, s)| *s).sum();
+        prop_assert_eq!(tree.total_size(), expected);
+    }
+
+    #[test]
+    fn prop____total_file_count_equals_input_count(files in arb_file_list()) {
+        let refs: Vec<(&str, u64)> = files.iter().map(|(p, s)| (p.as_str(), *s)).collect();
+        let tree = build_tree(&refs);
+        // File count may differ from input count due to duplicate paths being merged
+        // But it should never exceed input count
+        prop_assert!(tree.total_file_count() <= files.len());
+    }
+
+    #[test]
+    fn prop____echarts_preserves_total_size(files in arb_file_list()) {
+        let refs: Vec<(&str, u64)> = files.iter().map(|(p, s)| (p.as_str(), *s)).collect();
+        let tree = build_tree(&refs);
+        let expected = tree.total_size();
+
+        let echarts_children: Vec<EChartsNode> = tree
+            .children
+            .iter()
+            .map(|(name, node)| node.to_echarts(name))
+            .collect();
+
+        let echarts_size: u64 = echarts_children.iter().map(echarts_total_size).sum();
+        prop_assert_eq!(echarts_size, expected);
+    }
+
+    #[test]
+    fn prop____echarts_serializes_to_valid_json(files in arb_file_list()) {
+        let refs: Vec<(&str, u64)> = files.iter().map(|(p, s)| (p.as_str(), *s)).collect();
+        let tree = build_tree(&refs);
+
+        let echarts_children: Vec<EChartsNode> = tree
+            .children
+            .iter()
+            .map(|(name, node)| node.to_echarts(name))
+            .collect();
+
+        let json = serde_json::to_string(&echarts_children).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        prop_assert!(parsed.is_array());
+    }
+
+    #[test]
+    fn prop____every_dir_total_size_gte_children_sum(files in arb_file_list()) {
+        let refs: Vec<(&str, u64)> = files.iter().map(|(p, s)| (p.as_str(), *s)).collect();
+        let tree = build_tree(&refs);
+
+        fn check_invariant(node: &DirNode) -> bool {
+            let children_sum: u64 = node.children.values().map(|c| c.total_size()).sum();
+            if node.total_size() < children_sum {
+                return false;
+            }
+            node.children.values().all(check_invariant)
+        }
+
+        prop_assert!(check_invariant(&tree));
+    }
+}
