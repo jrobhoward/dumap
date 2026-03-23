@@ -1,13 +1,13 @@
 use clap::{Parser, Subcommand};
-use diskmap_core::scan::{ScanConfig, ScanProgress, find_largest, format_size, scan_directory};
-use diskmap_core::tree::EChartsNode;
+use dumap_core::scan::{ScanConfig, ScanProgress, find_largest, format_size, scan_directory};
+use dumap_core::tree::EChartsNode;
 use std::path::PathBuf;
 use std::sync::atomic::Ordering;
 use std::time::Instant;
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "diskmap",
+    name = "dumap",
     version,
     about = "Visualize disk usage with interactive treemaps"
 )]
@@ -24,8 +24,8 @@ enum Command {
         #[arg(default_value = ".")]
         path: PathBuf,
 
-        /// Output HTML file (default: diskmap.html)
-        #[arg(short, long, default_value = "diskmap.html")]
+        /// Output HTML file (default: dumap.html)
+        #[arg(short, long, default_value = "dumap.html")]
         output: PathBuf,
 
         /// Visible depth levels in treemap (default: 3)
@@ -183,7 +183,7 @@ fn run_scan(
     let tree_json = serde_json::to_string(&echarts_children)?;
 
     let scan_path = path.canonicalize().unwrap_or(path).display().to_string();
-    let html = diskmap_core::generate_html(
+    let html = dumap_core::generate_html(
         &tree_json,
         total_size,
         file_count as usize,
@@ -276,7 +276,7 @@ fn run_view(
         apparent_size,
     };
 
-    let title = format!("diskmap — {}", path.display());
+    let title = format!("dumap — {}", path.display());
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1200.0, 800.0])
@@ -287,7 +287,7 @@ fn run_view(
     eframe::run_native(
         &title,
         options,
-        Box::new(move |_cc| Ok(Box::new(diskmap_gui::DiskmapApp::new(scan_config)))),
+        Box::new(move |_cc| Ok(Box::new(dumap_gui::DumapApp::new(scan_config)))),
     )
     .map_err(|e| format!("GUI error: {e}").into())
 }

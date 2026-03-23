@@ -2,4 +2,4 @@ mod app;
 mod color;
 mod navigation;
 
-pub use app::DiskmapApp;
+pub use app::DumapApp;

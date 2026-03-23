@@ -3,11 +3,11 @@
 #![allow(non_snake_case)]
 
 use super::NavigationModel;
-use diskmap_core::tree::{build_file_tree, build_tree};
+use dumap_core::tree::{build_file_tree, build_tree};
 use std::path::PathBuf;
 
 /// Build a test tree: /root/{a/{b/{deep.txt}, mid.txt}, c/{other.txt}}
-fn make_test_tree() -> diskmap_core::FileTree {
+fn make_test_tree() -> dumap_core::FileTree {
     let files = vec![
         ("/a/b/deep.txt", 100u64),
         ("/a/mid.txt", 200),
@@ -19,10 +19,10 @@ fn make_test_tree() -> diskmap_core::FileTree {
 
 /// Find a node by name in the tree.
 fn find_node(
-    tree: &diskmap_core::FileTree,
-    id: diskmap_core::NodeId,
+    tree: &dumap_core::FileTree,
+    id: dumap_core::NodeId,
     name: &str,
-) -> Option<diskmap_core::NodeId> {
+) -> Option<dumap_core::NodeId> {
     if tree.node(id).name == name {
         return Some(id);
     }

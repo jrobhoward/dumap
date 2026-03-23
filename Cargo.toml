@@ -1,10 +1,10 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/diskmap-core",
-    "crates/diskmap-layout",
-    "crates/diskmap-gui",
-    "crates/diskmap-cli",
+    "crates/dumap-core",
+    "crates/dumap-layout",
+    "crates/dumap-gui",
+    "crates/dumap-cli",
 ]
 
 [workspace.package]
@@ -21,8 +21,8 @@ expect_used = "warn"
 
 [workspace.dependencies]
 # Internal crates
-diskmap-core = { path = "crates/diskmap-core" }
-diskmap-layout = { path = "crates/diskmap-layout" }
+dumap-core = { path = "crates/dumap-core" }
+dumap-layout = { path = "crates/dumap-layout" }
 
 # CLI
 clap = { version = "4", features = ["derive"] }

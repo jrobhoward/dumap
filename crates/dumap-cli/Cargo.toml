@@ -1,14 +1,14 @@
 [package]
-name = "diskmap-cli"
+name = "dumap-cli"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 authors.workspace = true
-description = "CLI tool for diskmap: scan directories and visualize disk usage as interactive treemaps"
+description = "CLI tool for dumap: scan directories and visualize disk usage as interactive treemaps"
 
 [[bin]]
-name = "diskmap"
+name = "dumap"
 path = "src/main.rs"
 
 [lints]
@@ -16,11 +16,11 @@ workspace = true
 
 [features]
 default = ["gui"]
-gui = ["dep:diskmap-gui", "dep:eframe", "dep:egui"]
+gui = ["dep:dumap-gui", "dep:eframe", "dep:egui"]
 
 [dependencies]
-diskmap-core = { workspace = true }
-diskmap-gui = { path = "../diskmap-gui", optional = true }
+dumap-core = { workspace = true }
+dumap-gui = { path = "../dumap-gui", optional = true }
 clap = { workspace = true }
 eframe = { workspace = true, optional = true }
 egui = { workspace = true, optional = true }

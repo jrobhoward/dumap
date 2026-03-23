@@ -22,7 +22,7 @@ pub fn generate_html(
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>diskmap — {scan_path}</title>
+<title>dumap — {scan_path}</title>
 <style>
   * {{ margin: 0; padding: 0; box-sizing: border-box; }}
   body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #1a1a2e; color: #e0e0e0; }}
@@ -38,7 +38,7 @@ pub fn generate_html(
 <body>
 <div id="header">
   <div style="display:flex;align-items:center;gap:24px;">
-    <h1>diskmap — {scan_path}</h1>
+    <h1>dumap — {scan_path}</h1>
     <div id="legend">
       <span class="item"><span class="swatch" style="background:#569cd6"></span>Code</span>
       <span class="item"><span class="swatch" style="background:#ce9134"></span>Image</span>

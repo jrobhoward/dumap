@@ -1,4 +1,4 @@
-use diskmap_core::tree::{FileTree, NodeId};
+use dumap_core::tree::{FileTree, NodeId};
 
 /// Tracks navigation state: which subtree is visible and the breadcrumb path.
 pub struct NavigationModel {

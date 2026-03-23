@@ -4,19 +4,19 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ## Project Overview
 
-diskmap is a cross-platform disk usage visualizer that scans directories and generates interactive treemap visualizations. Phase 1 outputs self-contained HTML files using ECharts; Phase 2 will add a native GUI via egui.
+dumap is a cross-platform disk usage visualizer that scans directories and generates interactive treemap visualizations. Phase 1 outputs self-contained HTML files using ECharts; Phase 2 will add a native GUI via egui.
 
 **Rust Requirements**: Edition 2024, rust-version 1.88.0
 
 ## Workspace Structure
 
 ```
-diskmap/
+dumap/
 ├── crates/
-│   ├── diskmap-core/     # Tree construction, filesystem scanning, HTML generation, FileTree arena
-│   ├── diskmap-layout/   # Squarified treemap layout algorithm (pure geometry)
-│   ├── diskmap-gui/      # Interactive egui treemap viewer
-│   └── diskmap-cli/      # CLI binary (scan, view, top subcommands)
+│   ├── dumap-core/     # Tree construction, filesystem scanning, HTML generation, FileTree arena
+│   ├── dumap-layout/   # Squarified treemap layout algorithm (pure geometry)
+│   ├── dumap-gui/      # Interactive egui treemap viewer
+│   └── dumap-cli/      # CLI binary (scan, view, top subcommands)
 └── clippy.toml           # allow-unwrap-in-tests = true
 ```
 
@@ -44,10 +44,10 @@ cargo run -- top /path [-n COUNT] [--files]         # CLI table output
 
 ### Crate Responsibilities
 
-- **diskmap-core**: `DirNode` tree (HashMap-based), `FileTree` (arena-allocated), `EChartsNode` JSON conversion, `scan_directory()` using `ignore::WalkBuilder`, `generate_html()` ECharts template, `format_size()`, `find_largest()`, `FileCategory` for extension-based type classification
-- **diskmap-layout**: Squarified treemap algorithm (`squarify_layout()`), `LayoutRect`, `LayoutEntry`, `TreemapLayout` with hit testing. Pure geometry, no I/O.
-- **diskmap-gui**: egui/eframe interactive viewer with background scan, category-colored treemap, click-to-zoom, right-click-to-zoom-out, breadcrumb navigation, tooltips, depth slider
-- **diskmap-cli**: `clap` CLI with `view` (launch GUI), `scan` (HTML treemap output), and `top` (table of largest entries) subcommands
+- **dumap-core**: `DirNode` tree (HashMap-based), `FileTree` (arena-allocated), `EChartsNode` JSON conversion, `scan_directory()` using `ignore::WalkBuilder`, `generate_html()` ECharts template, `format_size()`, `find_largest()`, `FileCategory` for extension-based type classification
+- **dumap-layout**: Squarified treemap algorithm (`squarify_layout()`), `LayoutRect`, `LayoutEntry`, `TreemapLayout` with hit testing. Pure geometry, no I/O.
+- **dumap-gui**: egui/eframe interactive viewer with background scan, category-colored treemap, click-to-zoom, right-click-to-zoom-out, breadcrumb navigation, tooltips, depth slider
+- **dumap-cli**: `clap` CLI with `view` (launch GUI), `scan` (HTML treemap output), and `top` (table of largest entries) subcommands
 
 ### Scanning
 
@@ -101,13 +101,13 @@ Self-contained HTML with ECharts CDN. Features: squarified treemap, `leafDepth: 
 
 ## Important Files
 
-- **Tree data structures**: `crates/diskmap-core/src/tree/node.rs` (DirNode, EChartsNode)
-- **Arena tree**: `crates/diskmap-core/src/tree/arena.rs` (FileTree, NodeId, TreeNode)
-- **File categories**: `crates/diskmap-core/src/category.rs` (FileCategory, extension mapping)
-- **Filesystem scanning**: `crates/diskmap-core/src/scan/walker.rs`
-- **HTML generation**: `crates/diskmap-core/src/html.rs`
-- **Squarified layout**: `crates/diskmap-layout/src/squarify.rs`
-- **Layout rectangle**: `crates/diskmap-layout/src/rect.rs`
-- **GUI app**: `crates/diskmap-gui/src/app.rs`
-- **Navigation model**: `crates/diskmap-gui/src/navigation.rs`
-- **CLI**: `crates/diskmap-cli/src/main.rs`
+- **Tree data structures**: `crates/dumap-core/src/tree/node.rs` (DirNode, EChartsNode)
+- **Arena tree**: `crates/dumap-core/src/tree/arena.rs` (FileTree, NodeId, TreeNode)
+- **File categories**: `crates/dumap-core/src/category.rs` (FileCategory, extension mapping)
+- **Filesystem scanning**: `crates/dumap-core/src/scan/walker.rs`
+- **HTML generation**: `crates/dumap-core/src/html.rs`
+- **Squarified layout**: `crates/dumap-layout/src/squarify.rs`
+- **Layout rectangle**: `crates/dumap-layout/src/rect.rs`
+- **GUI app**: `crates/dumap-gui/src/app.rs`
+- **Navigation model**: `crates/dumap-gui/src/navigation.rs`
+- **CLI**: `crates/dumap-cli/src/main.rs`

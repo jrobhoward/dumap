@@ -4,12 +4,12 @@
 
 use super::*;
 use crate::rect::LayoutRect;
-use diskmap_core::tree::{build_file_tree, build_tree};
+use dumap_core::tree::{build_file_tree, build_tree};
 use std::path::PathBuf;
 
 const EPSILON: f64 = 0.01;
 
-fn make_tree(files: &[(&str, u64)]) -> (diskmap_core::FileTree, NodeId) {
+fn make_tree(files: &[(&str, u64)]) -> (dumap_core::FileTree, NodeId) {
     let dir = build_tree(files);
     let ft = build_file_tree(&dir, PathBuf::from("/test"));
     let root = ft.root();

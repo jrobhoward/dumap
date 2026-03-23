@@ -1,9 +1,9 @@
 use crate::color::{category_color, lighten, node_color};
 use crate::navigation::NavigationModel;
-use diskmap_core::category::FileCategory;
-use diskmap_core::scan::{ScanConfig, ScanProgress, format_size};
-use diskmap_core::tree::{FileTree, NodeId, NodeKind};
-use diskmap_layout::{LayoutConfig, TreemapLayout, squarify_layout};
+use dumap_core::category::FileCategory;
+use dumap_core::scan::{ScanConfig, ScanProgress, format_size};
+use dumap_core::tree::{FileTree, NodeId, NodeKind};
+use dumap_layout::{LayoutConfig, TreemapLayout, squarify_layout};
 use egui::{Color32, CornerRadius, FontId, Pos2, Rect, Sense, Stroke, StrokeKind, Vec2};
 use std::sync::Arc;
 use std::sync::atomic::Ordering;
@@ -13,7 +13,7 @@ use std::time::Instant;
 const DIR_HEADER_HEIGHT: f64 = 20.0;
 
 /// Main application state.
-pub struct DiskmapApp {
+pub struct DumapApp {
     /// The scanned file tree (None until scan completes).
     tree: Option<Arc<FileTree>>,
     /// Cached layout (recomputed on resize, zoom, or depth change).
@@ -37,7 +37,7 @@ pub struct DiskmapApp {
     scan_duration: Option<f64>,
 }
 
-impl DiskmapApp {
+impl DumapApp {
     /// Create a new app that will scan the given path.
     pub fn new(scan_config: ScanConfig) -> Self {
         Self {
@@ -73,10 +73,10 @@ impl DiskmapApp {
         self.scan_receiver = Some(rx);
 
         std::thread::spawn(move || {
-            let result = diskmap_core::scan_directory(&config, &progress);
+            let result = dumap_core::scan_directory(&config, &progress);
             let _ = tx.send(result.map_err(|e| e.to_string()).map(|dir_node| {
                 let scan_root = config.root.clone();
-                diskmap_core::build_file_tree(&dir_node, scan_root)
+                dumap_core::build_file_tree(&dir_node, scan_root)
             }));
         });
     }
@@ -133,7 +133,7 @@ impl DiskmapApp {
         };
 
         let bounds =
-            diskmap_layout::LayoutRect::new(0.0, 0.0, panel_size.x as f64, panel_size.y as f64);
+            dumap_layout::LayoutRect::new(0.0, 0.0, panel_size.x as f64, panel_size.y as f64);
         let config = LayoutConfig {
             max_depth: nav.max_display_depth,
             min_rect_size: 2.0,
@@ -444,7 +444,7 @@ impl DiskmapApp {
     }
 }
 
-impl eframe::App for DiskmapApp {
+impl eframe::App for DumapApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Start scan on first frame
         if self.tree.is_none() && self.scan_receiver.is_none() {
@@ -479,7 +479,7 @@ impl eframe::App for DiskmapApp {
 }
 
 /// Convert a layout rect to an egui Rect, offset by the panel origin.
-fn to_egui_rect(r: &diskmap_layout::LayoutRect, origin: Pos2) -> Rect {
+fn to_egui_rect(r: &dumap_layout::LayoutRect, origin: Pos2) -> Rect {
     Rect::from_min_size(
         Pos2::new(origin.x + r.x as f32, origin.y + r.y as f32),
         Vec2::new(r.w as f32, r.h as f32),

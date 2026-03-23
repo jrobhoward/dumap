@@ -1,11 +1,11 @@
 [package]
-name = "diskmap-core"
+name = "dumap-core"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 authors.workspace = true
-description = "Core library for diskmap: filesystem scanning, tree construction, and HTML treemap generation"
+description = "Core library for dumap: filesystem scanning, tree construction, and HTML treemap generation"
 
 [lints]
 workspace = true

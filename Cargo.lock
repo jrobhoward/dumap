@@ -897,58 +897,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "diskmap-cli"
-version = "0.1.0"
-dependencies = [
- "clap",
- "diskmap-core",
- "diskmap-gui",
- "eframe",
- "egui",
- "open",
- "serde_json",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "diskmap-core"
-version = "0.1.0"
-dependencies = [
- "ignore",
- "parking_lot",
- "proptest",
- "rayon",
- "rstest",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.18",
- "tracing",
-]
-
-[[package]]
-name = "diskmap-gui"
-version = "0.1.0"
-dependencies = [
- "diskmap-core",
- "diskmap-layout",
- "eframe",
- "egui",
- "tempfile",
- "tracing",
-]
-
-[[package]]
-name = "diskmap-layout"
-version = "0.1.0"
-dependencies = [
- "diskmap-core",
- "proptest",
- "rstest",
-]
-
-[[package]]
 name = "dispatch"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1004,6 +952,58 @@ name = "dpi"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
+
+[[package]]
+name = "dumap-cli"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "dumap-core",
+ "dumap-gui",
+ "eframe",
+ "egui",
+ "open",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "dumap-core"
+version = "0.1.0"
+dependencies = [
+ "ignore",
+ "parking_lot",
+ "proptest",
+ "rayon",
+ "rstest",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.18",
+ "tracing",
+]
+
+[[package]]
+name = "dumap-gui"
+version = "0.1.0"
+dependencies = [
+ "dumap-core",
+ "dumap-layout",
+ "eframe",
+ "egui",
+ "tempfile",
+ "tracing",
+]
+
+[[package]]
+name = "dumap-layout"
+version = "0.1.0"
+dependencies = [
+ "dumap-core",
+ "proptest",
+ "rstest",
+]
 
 [[package]]
 name = "ecolor"

@@ -1,5 +1,5 @@
 use crate::rect::LayoutRect;
-use diskmap_core::tree::{FileTree, NodeId, NodeKind};
+use dumap_core::tree::{FileTree, NodeId, NodeKind};
 
 /// Configuration for the layout algorithm.
 #[derive(Debug, Clone)]

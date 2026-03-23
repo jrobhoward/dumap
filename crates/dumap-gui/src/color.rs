@@ -1,5 +1,5 @@
-use diskmap_core::category::FileCategory;
-use diskmap_core::tree::{NodeKind, TreeNode};
+use dumap_core::category::FileCategory;
+use dumap_core::tree::{NodeKind, TreeNode};
 use egui::Color32;
 
 /// Convert a FileCategory to an egui Color32, using the shared RGB values.
