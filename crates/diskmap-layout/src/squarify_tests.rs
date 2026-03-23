@@ -210,3 +210,98 @@ proptest! {
         prop_assert!(!layout.is_empty(), "Layout should have at least the root entry");
     }
 }
+
+// --- Unit tests for internal functions ---
+
+#[test]
+fn worst_aspect_ratio____square_item____returns_one() {
+    // A single item filling a square strip should have aspect ratio ~1
+    let node_id = NodeId(0);
+    let row = vec![(node_id, 100.0)];
+    let ratio = worst_aspect_ratio(&row, 100.0, 10.0, 100.0, 100.0);
+    assert!((1.0..1.01).contains(&ratio), "Expected ~1.0, got {ratio}");
+}
+
+#[test]
+fn worst_aspect_ratio____zero_row_size____returns_max() {
+    let node_id = NodeId(0);
+    let row = vec![(node_id, 0.0)];
+    let ratio = worst_aspect_ratio(&row, 0.0, 10.0, 100.0, 100.0);
+    assert_eq!(ratio, f64::MAX);
+}
+
+#[test]
+fn worst_aspect_ratio____zero_shorter_side____returns_max() {
+    let node_id = NodeId(0);
+    let row = vec![(node_id, 50.0)];
+    let ratio = worst_aspect_ratio(&row, 50.0, 0.0, 100.0, 100.0);
+    assert_eq!(ratio, f64::MAX);
+}
+
+#[test]
+fn worst_aspect_ratio____multiple_items____worst_is_smallest() {
+    let row = vec![(NodeId(0), 900.0), (NodeId(1), 100.0)];
+    let ratio = worst_aspect_ratio(&row, 1000.0, 10.0, 1000.0, 1000.0);
+    // The smaller item (100/1000 of shorter_side = 1px) with strip thickness 10px
+    // gives aspect ratio 10, which is the worst
+    assert!(
+        ratio > 5.0,
+        "Expected high ratio for unequal items, got {ratio}"
+    );
+}
+
+#[test]
+fn layout_row____single_item____fills_strip() {
+    let node_id = NodeId(0);
+    let row = vec![(node_id, 100.0)];
+    let strip = LayoutRect::new(10.0, 20.0, 200.0, 50.0);
+    let mut out = Vec::new();
+    layout_row(&row, 100.0, strip, &mut out);
+
+    assert_eq!(out.len(), 1);
+    let (id, rect) = &out[0];
+    assert_eq!(*id, node_id);
+    assert!((rect.w - 200.0).abs() < EPSILON);
+    assert!((rect.h - 50.0).abs() < EPSILON);
+}
+
+#[test]
+fn layout_row____two_equal_items____split_evenly() {
+    let row = vec![(NodeId(0), 50.0), (NodeId(1), 50.0)];
+    let strip = LayoutRect::new(0.0, 0.0, 100.0, 50.0); // wide strip
+    let mut out = Vec::new();
+    layout_row(&row, 100.0, strip, &mut out);
+
+    assert_eq!(out.len(), 2);
+    // Should split width evenly
+    assert!((out[0].1.w - 50.0).abs() < EPSILON);
+    assert!((out[1].1.w - 50.0).abs() < EPSILON);
+    // Both should have full height
+    assert!((out[0].1.h - 50.0).abs() < EPSILON);
+    assert!((out[1].1.h - 50.0).abs() < EPSILON);
+}
+
+#[test]
+fn layout_row____tall_strip____splits_vertically() {
+    let row = vec![(NodeId(0), 75.0), (NodeId(1), 25.0)];
+    let strip = LayoutRect::new(0.0, 0.0, 30.0, 100.0); // tall strip
+    let mut out = Vec::new();
+    layout_row(&row, 100.0, strip, &mut out);
+
+    assert_eq!(out.len(), 2);
+    // Should split height (75/25 split)
+    assert!((out[0].1.h - 75.0).abs() < EPSILON);
+    assert!((out[1].1.h - 25.0).abs() < EPSILON);
+    // Both should have full width
+    assert!((out[0].1.w - 30.0).abs() < EPSILON);
+    assert!((out[1].1.w - 30.0).abs() < EPSILON);
+}
+
+#[test]
+fn layout_row____zero_row_size____no_output() {
+    let row: Vec<(NodeId, f64)> = vec![];
+    let strip = LayoutRect::new(0.0, 0.0, 100.0, 50.0);
+    let mut out = Vec::new();
+    layout_row(&row, 0.0, strip, &mut out);
+    assert!(out.is_empty());
+}

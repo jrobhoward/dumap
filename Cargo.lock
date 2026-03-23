@@ -935,6 +935,7 @@ dependencies = [
  "diskmap-layout",
  "eframe",
  "egui",
+ "tempfile",
  "tracing",
 ]
 

@@ -16,3 +16,6 @@ diskmap-layout = { workspace = true }
 eframe = { workspace = true }
 egui = { workspace = true }
 tracing = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

@@ -143,6 +143,50 @@ fn find_largest____files_only____returns_correct_order() {
     assert!(largest[1].1 >= largest[2].1);
 }
 
+#[test]
+fn find_largest____directories____returns_dirs_sorted() {
+    let dir = create_test_dir();
+    let config = ScanConfig {
+        root: dir.path().to_path_buf(),
+        apparent_size: true,
+        ..Default::default()
+    };
+    let progress = ScanProgress::new();
+    let tree = scan_directory(&config, &progress).unwrap();
+
+    let largest = find_largest(&tree, dir.path(), 10, false);
+    // Should include directories (subdir, subdir/nested) plus files
+    assert!(
+        largest.len() > 3,
+        "Expected dirs + files, got {}",
+        largest.len()
+    );
+    // Sorted descending
+    for i in 0..largest.len().saturating_sub(1) {
+        assert!(
+            largest[i].1 >= largest[i + 1].1,
+            "Not sorted at index {i}: {} < {}",
+            largest[i].1,
+            largest[i + 1].1
+        );
+    }
+}
+
+#[test]
+fn find_largest____count_truncation____respects_limit() {
+    let dir = create_test_dir();
+    let config = ScanConfig {
+        root: dir.path().to_path_buf(),
+        apparent_size: true,
+        ..Default::default()
+    };
+    let progress = ScanProgress::new();
+    let tree = scan_directory(&config, &progress).unwrap();
+
+    let largest = find_largest(&tree, dir.path(), 2, true);
+    assert_eq!(largest.len(), 2);
+}
+
 #[cfg(unix)]
 #[test]
 fn scan_directory____symlink____does_not_follow() {

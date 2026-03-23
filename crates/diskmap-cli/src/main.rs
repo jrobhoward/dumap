@@ -50,6 +50,7 @@ enum Command {
     },
 
     /// Open interactive GUI treemap viewer
+    #[cfg(feature = "gui")]
     View {
         /// Directory to scan (default: current directory)
         #[arg(default_value = ".")]
@@ -117,6 +118,7 @@ fn main() {
             max_scan_depth,
             open,
         ),
+        #[cfg(feature = "gui")]
         Command::View {
             path,
             apparent_size,
@@ -260,6 +262,7 @@ fn run_top(
     Ok(())
 }
 
+#[cfg(feature = "gui")]
 fn run_view(
     path: PathBuf,
     apparent_size: bool,

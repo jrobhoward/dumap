@@ -76,3 +76,7 @@ impl NavigationModel {
         self.breadcrumb.len() > 1
     }
 }
+
+#[cfg(test)]
+#[path = "navigation_tests.rs"]
+mod navigation_tests;
