@@ -49,6 +49,21 @@ enum Command {
         open: bool,
     },
 
+    /// Open interactive GUI treemap viewer
+    View {
+        /// Directory to scan (default: current directory)
+        #[arg(default_value = ".")]
+        path: PathBuf,
+
+        /// Use apparent file sizes instead of disk usage
+        #[arg(long)]
+        apparent_size: bool,
+
+        /// Include hidden files and directories
+        #[arg(long)]
+        include_hidden: bool,
+    },
+
     /// Show the largest files or directories (no GUI)
     Top {
         /// Directory to scan (default: current directory)
@@ -102,6 +117,11 @@ fn main() {
             max_scan_depth,
             open,
         ),
+        Command::View {
+            path,
+            apparent_size,
+            include_hidden,
+        } => run_view(path, apparent_size, include_hidden),
         Command::Top {
             path,
             count,
@@ -238,4 +258,33 @@ fn run_top(
     }
 
     Ok(())
+}
+
+fn run_view(
+    path: PathBuf,
+    apparent_size: bool,
+    include_hidden: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let scan_config = ScanConfig {
+        root: path.clone(),
+        follow_links: false,
+        include_hidden,
+        max_depth: None,
+        apparent_size,
+    };
+
+    let title = format!("diskmap — {}", path.display());
+    let options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size([1200.0, 800.0])
+            .with_title(&title),
+        ..Default::default()
+    };
+
+    eframe::run_native(
+        &title,
+        options,
+        Box::new(move |_cc| Ok(Box::new(diskmap_gui::DiskmapApp::new(scan_config)))),
+    )
+    .map_err(|e| format!("GUI error: {e}").into())
 }

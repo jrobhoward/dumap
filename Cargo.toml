@@ -2,6 +2,8 @@
 resolver = "2"
 members = [
     "crates/diskmap-core",
+    "crates/diskmap-layout",
+    "crates/diskmap-gui",
     "crates/diskmap-cli",
 ]
 
@@ -20,6 +22,7 @@ expect_used = "warn"
 [workspace.dependencies]
 # Internal crates
 diskmap-core = { path = "crates/diskmap-core" }
+diskmap-layout = { path = "crates/diskmap-layout" }
 
 # CLI
 clap = { version = "4", features = ["derive"] }
@@ -41,6 +44,10 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Error handling
 thiserror = "2"
+
+# GUI
+eframe = "0.31"
+egui = "0.31"
 
 # Utilities
 open = "5"

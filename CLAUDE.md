@@ -13,8 +13,10 @@ diskmap is a cross-platform disk usage visualizer that scans directories and gen
 ```
 diskmap/
 ├── crates/
-│   ├── diskmap-core/     # Tree construction, filesystem scanning, HTML generation
-│   └── diskmap-cli/      # CLI binary (scan + top subcommands)
+│   ├── diskmap-core/     # Tree construction, filesystem scanning, HTML generation, FileTree arena
+│   ├── diskmap-layout/   # Squarified treemap layout algorithm (pure geometry)
+│   ├── diskmap-gui/      # Interactive egui treemap viewer
+│   └── diskmap-cli/      # CLI binary (scan, view, top subcommands)
 └── clippy.toml           # allow-unwrap-in-tests = true
 ```
 
@@ -33,16 +35,19 @@ cargo clippy --workspace --tests
 cargo fmt --all
 
 # Run
-cargo run -- scan /path [-o output.html] [--depth N] [--open]
-cargo run -- top /path [-n COUNT] [--files]
+cargo run -- view /path                            # Interactive GUI treemap
+cargo run -- scan /path [-o output.html] [--open]  # HTML export
+cargo run -- top /path [-n COUNT] [--files]         # CLI table output
 ```
 
 ## Key Architecture
 
 ### Crate Responsibilities
 
-- **diskmap-core**: `DirNode` tree (HashMap-based), `EChartsNode` JSON conversion, `scan_directory()` using `ignore::WalkBuilder`, `generate_html()` ECharts template, `format_size()`, `find_largest()`
-- **diskmap-cli**: `clap` CLI with `scan` (HTML treemap output) and `top` (table of largest entries) subcommands
+- **diskmap-core**: `DirNode` tree (HashMap-based), `FileTree` (arena-allocated), `EChartsNode` JSON conversion, `scan_directory()` using `ignore::WalkBuilder`, `generate_html()` ECharts template, `format_size()`, `find_largest()`, `FileCategory` for extension-based type classification
+- **diskmap-layout**: Squarified treemap algorithm (`squarify_layout()`), `LayoutRect`, `LayoutEntry`, `TreemapLayout` with hit testing. Pure geometry, no I/O.
+- **diskmap-gui**: egui/eframe interactive viewer with background scan, category-colored treemap, click-to-zoom, right-click-to-zoom-out, breadcrumb navigation, tooltips, depth slider
+- **diskmap-cli**: `clap` CLI with `view` (launch GUI), `scan` (HTML treemap output), and `top` (table of largest entries) subcommands
 
 ### Scanning
 
@@ -96,8 +101,13 @@ Self-contained HTML with ECharts CDN. Features: squarified treemap, `leafDepth: 
 
 ## Important Files
 
-- **Tree data structures**: `crates/diskmap-core/src/tree/node.rs`
+- **Tree data structures**: `crates/diskmap-core/src/tree/node.rs` (DirNode, EChartsNode)
+- **Arena tree**: `crates/diskmap-core/src/tree/arena.rs` (FileTree, NodeId, TreeNode)
+- **File categories**: `crates/diskmap-core/src/category.rs` (FileCategory, extension mapping)
 - **Filesystem scanning**: `crates/diskmap-core/src/scan/walker.rs`
 - **HTML generation**: `crates/diskmap-core/src/html.rs`
-- **Error types**: `crates/diskmap-core/src/error.rs`
+- **Squarified layout**: `crates/diskmap-layout/src/squarify.rs`
+- **Layout rectangle**: `crates/diskmap-layout/src/rect.rs`
+- **GUI app**: `crates/diskmap-gui/src/app.rs`
+- **Navigation model**: `crates/diskmap-gui/src/navigation.rs`
 - **CLI**: `crates/diskmap-cli/src/main.rs`

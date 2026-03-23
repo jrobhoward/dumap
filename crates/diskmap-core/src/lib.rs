@@ -8,4 +8,4 @@ pub use category::FileCategory;
 pub use error::ScanError;
 pub use html::generate_html;
 pub use scan::{ScanConfig, ScanProgress, scan_directory};
-pub use tree::{DirNode, EChartsNode};
+pub use tree::{DirNode, EChartsNode, FileTree, NodeId, NodeKind, TreeNode, build_file_tree};

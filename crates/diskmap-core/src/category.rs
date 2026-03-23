@@ -81,22 +81,45 @@ impl FileCategory {
         }
     }
 
-    /// CSS color for this category (hex string).
-    pub fn color(&self) -> &'static str {
+    /// All category variants, for iteration (e.g. legends).
+    pub const ALL: &[FileCategory] = &[
+        Self::Code,
+        Self::Image,
+        Self::Video,
+        Self::Audio,
+        Self::Archive,
+        Self::Document,
+        Self::Database,
+        Self::Executable,
+        Self::Font,
+        Self::Config,
+        Self::Data,
+        Self::Other,
+    ];
+
+    /// RGB color for this category. Single source of truth for both
+    /// the HTML hex string and the GUI Color32.
+    pub fn rgb(&self) -> (u8, u8, u8) {
         match self {
-            Self::Code => "#569cd6",       // blue
-            Self::Image => "#ce9134",      // amber
-            Self::Video => "#d65656",      // red
-            Self::Audio => "#9c56d6",      // purple
-            Self::Archive => "#56d69c",    // teal
-            Self::Document => "#d6ce56",   // yellow
-            Self::Database => "#d68256",   // orange
-            Self::Executable => "#b45656", // dark red
-            Self::Font => "#969696",       // gray
-            Self::Config => "#78b478",     // green
-            Self::Data => "#5688d6",       // steel blue
-            Self::Other => "#646478",      // dark gray-blue
+            Self::Code => (86, 156, 214),      // blue
+            Self::Image => (206, 145, 52),     // amber
+            Self::Video => (214, 86, 86),      // red
+            Self::Audio => (156, 86, 214),     // purple
+            Self::Archive => (86, 214, 156),   // teal
+            Self::Document => (214, 206, 86),  // yellow
+            Self::Database => (214, 130, 86),  // orange
+            Self::Executable => (180, 86, 86), // dark red
+            Self::Font => (150, 150, 150),     // gray
+            Self::Config => (120, 180, 120),   // green
+            Self::Data => (86, 136, 214),      // steel blue
+            Self::Other => (100, 100, 120),    // dark gray-blue
         }
+    }
+
+    /// CSS color for this category (hex string), derived from `rgb()`.
+    pub fn color(&self) -> String {
+        let (r, g, b) = self.rgb();
+        format!("#{r:02x}{g:02x}{b:02x}")
     }
 
     /// Short label for the category.
@@ -121,7 +144,7 @@ impl FileCategory {
 /// Serialize FileCategory as its color string for ECharts.
 impl Serialize for FileCategory {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.serialize_str(self.color())
+        serializer.serialize_str(&self.color())
     }
 }
 
