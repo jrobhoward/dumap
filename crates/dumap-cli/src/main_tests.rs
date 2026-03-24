@@ -167,7 +167,7 @@ fn run_export____html_contains_scan_path() {
     .unwrap();
 
     let html = fs::read_to_string(&output).unwrap();
-    // The canonicalized path should appear in the HTML
-    let canonical = scan_dir.canonicalize().unwrap();
+    // The cleaned canonicalized path should appear in the HTML (no \\?\ prefix)
+    let canonical = clean_path(scan_dir.canonicalize().unwrap());
     assert!(html.contains(&canonical.display().to_string()));
 }

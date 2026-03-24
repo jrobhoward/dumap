@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand};
+use dumap_core::clean_path;
 use dumap_core::scan::{ScanConfig, ScanProgress, format_size, scan_directory};
 use dumap_core::tree::EChartsNode;
 use std::path::PathBuf;
@@ -163,7 +164,9 @@ fn run_export(
 
     let tree_json = serde_json::to_string(&echarts_children)?;
 
-    let scan_path = path.canonicalize().unwrap_or(path).display().to_string();
+    let scan_path = clean_path(path.canonicalize().unwrap_or(path))
+        .display()
+        .to_string();
     let html = dumap_core::generate_html(
         &tree_json,
         total_size,
@@ -176,7 +179,7 @@ fn run_export(
     eprintln!("Treemap written to {}", output.display());
 
     if open_browser {
-        let abs_output = std::fs::canonicalize(&output)?;
+        let abs_output = clean_path(std::fs::canonicalize(&output)?);
         if let Err(err) = open::that(abs_output.as_os_str()) {
             eprintln!("Failed to open browser: {err}");
         }

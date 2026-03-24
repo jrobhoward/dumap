@@ -1,4 +1,5 @@
 use crate::error::ScanError;
+use crate::path_util::clean_path;
 use crate::tree::{DirNode, split_path};
 use ignore::WalkBuilder;
 use parking_lot::RwLock;
@@ -100,10 +101,10 @@ pub fn scan_directory(config: &ScanConfig, progress: &ScanProgress) -> Result<Di
         return Err(ScanError::NotADirectory(root.clone()));
     }
 
-    let root_canonical = root.canonicalize().map_err(|e| ScanError::Io {
+    let root_canonical = clean_path(root.canonicalize().map_err(|e| ScanError::Io {
         path: root.clone(),
         source: e,
-    })?;
+    })?);
 
     let mut builder = WalkBuilder::new(&root_canonical);
     builder
