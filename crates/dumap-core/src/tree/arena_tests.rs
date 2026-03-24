@@ -115,6 +115,80 @@ fn build_file_tree____path____reconstructs_from_root() {
 }
 
 #[test]
+fn path____root_node____returns_empty_path() {
+    let files = vec![("/a/file.txt", 100u64)];
+    let dir = build_tree(&files);
+    let tree = build_file_tree(&dir, PathBuf::from("/scan"));
+
+    let root_path = tree.path(tree.root());
+    assert_eq!(
+        root_path,
+        PathBuf::new(),
+        "Root path should be empty since it represents scan_root itself"
+    );
+}
+
+#[test]
+fn path____joined_with_scan_root____produces_correct_absolute_path() {
+    let files = vec![("/a/b/deep.txt", 100u64)];
+    let dir = build_tree(&files);
+    let tree = build_file_tree(&dir, PathBuf::from("/scan"));
+
+    fn find_by_name(tree: &FileTree, id: NodeId, name: &str) -> Option<NodeId> {
+        if tree.node(id).name == name {
+            return Some(id);
+        }
+        for child_id in tree.children(id) {
+            if let Some(found) = find_by_name(tree, *child_id, name) {
+                return Some(found);
+            }
+        }
+        None
+    }
+
+    let leaf_id = find_by_name(&tree, tree.root(), "deep.txt").unwrap();
+    let rel_path = tree.path(leaf_id);
+    let abs_path = tree.scan_root().join(&rel_path);
+
+    // Must not duplicate the root component
+    let abs_str = abs_path.to_string_lossy();
+    assert!(
+        abs_str.ends_with("deep.txt"),
+        "Absolute path should end with filename: {abs_str}"
+    );
+    // Count occurrences of "scan" — should appear exactly once (from scan_root)
+    assert_eq!(
+        abs_str.matches("scan").count(),
+        1,
+        "Root component should not be duplicated: {abs_str}"
+    );
+}
+
+#[test]
+fn path____intermediate_node____joined_correctly() {
+    let files = vec![("/subdir/file.txt", 100u64)];
+    let dir = build_tree(&files);
+    let scan_root = PathBuf::from("/myroot");
+    let tree = build_file_tree(&dir, scan_root.clone());
+
+    fn find_by_name(tree: &FileTree, id: NodeId, name: &str) -> Option<NodeId> {
+        if tree.node(id).name == name {
+            return Some(id);
+        }
+        for child_id in tree.children(id) {
+            if let Some(found) = find_by_name(tree, *child_id, name) {
+                return Some(found);
+            }
+        }
+        None
+    }
+
+    let dir_id = find_by_name(&tree, tree.root(), "subdir").unwrap();
+    let abs_path = tree.scan_root().join(tree.path(dir_id));
+    assert_eq!(abs_path, PathBuf::from("/myroot/subdir"));
+}
+
+#[test]
 fn build_file_tree____parent_links____correct() {
     let tree = make_test_tree();
     for child_id in tree.children(tree.root()) {

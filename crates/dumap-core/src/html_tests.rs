@@ -3,6 +3,7 @@
 #![allow(non_snake_case)]
 
 use super::generate_html;
+use crate::category::FileCategory;
 
 #[test]
 fn generate_html____valid_data____contains_echarts_and_json() {
@@ -42,4 +43,34 @@ fn generate_html____output_is_valid_html____has_doctype_and_closing_tags() {
     assert!(html.contains("</html>"));
     assert!(html.contains("</body>"));
     assert!(html.contains("</script>"));
+}
+
+#[test]
+fn generate_html____legend____includes_all_categories_with_correct_colors() {
+    let json = "[]";
+    let html = generate_html(json, 0, 0, "/", 3);
+
+    for cat in FileCategory::ALL {
+        let color = cat.color();
+        let label = cat.label();
+        assert!(
+            html.contains(&color),
+            "HTML legend missing color {color} for category {label}"
+        );
+        assert!(html.contains(label), "HTML legend missing label {label}");
+    }
+}
+
+#[test]
+fn generate_html____legend____category_count_matches() {
+    let json = "[]";
+    let html = generate_html(json, 0, 0, "/", 3);
+
+    let swatch_count = html.matches("class=\"swatch\"").count();
+    assert_eq!(
+        swatch_count,
+        FileCategory::ALL.len(),
+        "Legend should have exactly {} swatches, found {swatch_count}",
+        FileCategory::ALL.len()
+    );
 }

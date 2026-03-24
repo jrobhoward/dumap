@@ -20,9 +20,9 @@ pub fn node_color(node: &TreeNode) -> Color32 {
 pub fn lighten(color: Color32, factor: f32) -> Color32 {
     let f = factor.clamp(0.0, 1.0);
     Color32::from_rgb(
-        (color.r() as f32 + (255.0 - color.r() as f32) * f) as u8,
-        (color.g() as f32 + (255.0 - color.g() as f32) * f) as u8,
-        (color.b() as f32 + (255.0 - color.b() as f32) * f) as u8,
+        (color.r() as f32 + (255.0 - color.r() as f32) * f).min(255.0) as u8,
+        (color.g() as f32 + (255.0 - color.g() as f32) * f).min(255.0) as u8,
+        (color.b() as f32 + (255.0 - color.b() as f32) * f).min(255.0) as u8,
     )
 }
 

@@ -3,6 +3,7 @@
 #![allow(non_snake_case)]
 
 use super::walker::*;
+use crate::tree::build_file_tree;
 use std::fs;
 use tempfile::TempDir;
 
@@ -144,4 +145,51 @@ fn scan_directory____symlink____does_not_follow() {
     // Should only find the real file, not the symlink
     assert_eq!(tree.total_file_count(), 1);
     assert_eq!(tree.total_size(), 4);
+}
+
+#[test]
+fn scan_directory____path_join____does_not_duplicate_root_component() {
+    let dir = create_test_dir();
+    let config = ScanConfig {
+        root: dir.path().to_path_buf(),
+        apparent_size: true,
+        ..Default::default()
+    };
+    let progress = ScanProgress::new();
+
+    let dir_node = scan_directory(&config, &progress).unwrap();
+    let scan_root = dir.path().canonicalize().unwrap();
+    let tree = build_file_tree(&dir_node, scan_root.clone());
+
+    // Walk all leaves and verify absolute paths don't duplicate the root
+    fn check_paths(
+        tree: &crate::tree::FileTree,
+        id: crate::tree::NodeId,
+        scan_root: &std::path::Path,
+    ) {
+        let rel_path = tree.path(id);
+        let abs_path = scan_root.join(&rel_path);
+        let abs_str = abs_path.to_string_lossy();
+
+        // The scan_root's last component should appear exactly once
+        if let Some(root_name) = scan_root.file_name() {
+            let root_name_str = root_name.to_string_lossy();
+            // Count how many times the root dir name appears as a path component
+            let components: Vec<_> = abs_path.components().collect();
+            let occurrences = components
+                .iter()
+                .filter(|c| c.as_os_str() == root_name)
+                .count();
+            assert!(
+                occurrences <= 1,
+                "Root component '{root_name_str}' duplicated in path: {abs_str}"
+            );
+        }
+
+        for child_id in tree.children(id) {
+            check_paths(tree, *child_id, scan_root);
+        }
+    }
+
+    check_paths(&tree, tree.root(), &scan_root);
 }

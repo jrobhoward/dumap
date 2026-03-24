@@ -54,6 +54,12 @@ pub struct FileTree {
 impl FileTree {
     /// Get a node by ID.
     pub fn node(&self, id: NodeId) -> &TreeNode {
+        debug_assert!(
+            (id.0 as usize) < self.nodes.len(),
+            "invalid NodeId: {} (tree has {} nodes)",
+            id.0,
+            self.nodes.len()
+        );
         &self.nodes[id.0 as usize]
     }
 

@@ -1,4 +1,21 @@
+use crate::category::FileCategory;
 use crate::scan::format_size;
+
+/// Build the legend HTML from `FileCategory::ALL` so it stays in sync
+/// with category colors and labels automatically.
+fn build_legend_html() -> String {
+    FileCategory::ALL
+        .iter()
+        .map(|cat| {
+            format!(
+                r#"<span class="item"><span class="swatch" style="background:{}"></span>{}</span>"#,
+                cat.color(),
+                cat.label()
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n      ")
+}
 
 /// Generate an interactive HTML treemap using ECharts.
 ///
@@ -17,6 +34,7 @@ pub fn generate_html(
     leaf_depth: u16,
 ) -> String {
     let total_size_str = format_size(total_size);
+    let legend_html = build_legend_html();
     format!(
         r##"<!DOCTYPE html>
 <html lang="en">
@@ -40,17 +58,7 @@ pub fn generate_html(
   <div style="display:flex;align-items:center;gap:24px;">
     <h1>dumap — {scan_path}</h1>
     <div id="legend">
-      <span class="item"><span class="swatch" style="background:#569cd6"></span>Code</span>
-      <span class="item"><span class="swatch" style="background:#ce9134"></span>Image</span>
-      <span class="item"><span class="swatch" style="background:#d65656"></span>Video</span>
-      <span class="item"><span class="swatch" style="background:#9c56d6"></span>Audio</span>
-      <span class="item"><span class="swatch" style="background:#56d69c"></span>Archive</span>
-      <span class="item"><span class="swatch" style="background:#d6ce56"></span>Document</span>
-      <span class="item"><span class="swatch" style="background:#d68256"></span>Database</span>
-      <span class="item"><span class="swatch" style="background:#b45656"></span>Executable</span>
-      <span class="item"><span class="swatch" style="background:#78b478"></span>Config</span>
-      <span class="item"><span class="swatch" style="background:#5688d6"></span>Data</span>
-      <span class="item"><span class="swatch" style="background:#646478"></span>Other</span>
+      {legend_html}
     </div>
   </div>
   <div class="stats">{file_count} files &middot; {total_size_str} total</div>

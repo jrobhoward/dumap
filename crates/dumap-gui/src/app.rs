@@ -57,13 +57,7 @@ impl DumapApp {
 
     /// Start the scan in a background thread.
     fn start_scan(&mut self) {
-        let config = ScanConfig {
-            root: self.scan_config.root.clone(),
-            follow_links: self.scan_config.follow_links,
-            include_hidden: self.scan_config.include_hidden,
-            max_depth: self.scan_config.max_depth,
-            apparent_size: self.scan_config.apparent_size,
-        };
+        let config = self.scan_config.clone();
 
         let progress = Arc::new(ScanProgress::new());
         self.scan_progress = Some(Arc::clone(&progress));
@@ -74,6 +68,7 @@ impl DumapApp {
 
         std::thread::spawn(move || {
             let result = dumap_core::scan_directory(&config, &progress);
+            // Ignore send error: receiver dropped means the app closed during scan
             let _ = tx.send(result.map_err(|e| e.to_string()).map(|dir_node| {
                 let scan_root = config.root.clone();
                 dumap_core::build_file_tree(&dir_node, scan_root)
@@ -367,6 +362,12 @@ impl DumapApp {
             }
         }
 
+        self.handle_input(ui, &response, &tree);
+        self.render_context_menu(response, &tree);
+    }
+
+    /// Handle scroll-wheel and click-to-zoom input on the treemap.
+    fn handle_input(&mut self, ui: &mut egui::Ui, response: &egui::Response, tree: &FileTree) {
         // Scroll wheel to zoom — one level per scroll event.
         // Use raw scroll_delta (not smooth) and only respond to the first
         // event per frame to avoid jumping multiple levels.
@@ -377,9 +378,8 @@ impl DumapApp {
                 && matches!(tree.node(hovered_id).kind, NodeKind::Directory { .. })
                 && let Some(nav) = &mut self.navigation
             {
-                nav.zoom_into(hovered_id, &tree);
-                self.layout = None;
-                self.last_panel_size = None;
+                nav.zoom_into(hovered_id, tree);
+                self.invalidate_layout();
             }
         } else if scroll_delta < 0.0 {
             // Scroll down = zoom out
@@ -387,8 +387,7 @@ impl DumapApp {
                 && nav.can_zoom_out()
             {
                 nav.zoom_out();
-                self.layout = None;
-                self.last_panel_size = None;
+                self.invalidate_layout();
             }
         }
 
@@ -398,48 +397,51 @@ impl DumapApp {
             && matches!(tree.node(hovered_id).kind, NodeKind::Directory { .. })
             && let Some(nav) = &mut self.navigation
         {
-            nav.zoom_into(hovered_id, &tree);
-            self.layout = None;
-            self.last_panel_size = None;
+            nav.zoom_into(hovered_id, tree);
+            self.invalidate_layout();
         }
 
-        // Right-click context menu
+        // Right-click sets context menu target
         if response.secondary_clicked() {
             self.context_menu_node = self.hovered;
         }
+    }
 
-        // Draw context menu if active
-        if self.context_menu_node.is_some() {
-            let mut close_menu = false;
-            let ctx_node = self.context_menu_node;
+    /// Draw the right-click context menu with copy-path actions.
+    fn render_context_menu(&mut self, response: egui::Response, tree: &FileTree) {
+        if self.context_menu_node.is_none() {
+            return;
+        }
 
-            response.clone().context_menu(|ui| {
-                if let Some(node_id) = ctx_node {
-                    let node = tree.node(node_id);
-                    let path = tree.path(node_id);
-                    let scan_root = tree.scan_root();
-                    let abs_path = scan_root.join(&path);
+        let mut close_menu = false;
+        let ctx_node = self.context_menu_node;
 
-                    ui.label(egui::RichText::new(&node.name).strong().size(12.0));
-                    ui.separator();
+        response.context_menu(|ui| {
+            if let Some(node_id) = ctx_node {
+                let node = tree.node(node_id);
+                let path = tree.path(node_id);
+                let scan_root = tree.scan_root();
+                let abs_path = scan_root.join(&path);
 
-                    if ui.button("Copy absolute path").clicked() {
-                        ui.ctx().copy_text(abs_path.display().to_string());
-                        close_menu = true;
-                    }
+                ui.label(egui::RichText::new(&node.name).strong().size(12.0));
+                ui.separator();
 
-                    if let Some(parent_path) = abs_path.parent()
-                        && ui.button("Copy parent folder path").clicked()
-                    {
-                        ui.ctx().copy_text(parent_path.display().to_string());
-                        close_menu = true;
-                    }
+                if ui.button("Copy absolute path").clicked() {
+                    ui.ctx().copy_text(abs_path.display().to_string());
+                    close_menu = true;
                 }
-            });
 
-            if close_menu {
-                self.context_menu_node = None;
+                if let Some(parent_path) = abs_path.parent()
+                    && ui.button("Copy parent folder path").clicked()
+                {
+                    ui.ctx().copy_text(parent_path.display().to_string());
+                    close_menu = true;
+                }
             }
+        });
+
+        if close_menu {
+            self.context_menu_node = None;
         }
     }
 }

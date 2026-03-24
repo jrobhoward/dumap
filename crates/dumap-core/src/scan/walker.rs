@@ -8,6 +8,7 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use tracing::debug;
 
 /// Configuration for a filesystem scan.
+#[derive(Clone)]
 pub struct ScanConfig {
     /// Root path to scan
     pub root: PathBuf,
