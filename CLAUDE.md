@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -30,24 +30,29 @@ cargo build --release
 # Run all tests
 cargo test --workspace
 
+# Run a single test (by name substring)
+cargo test -p dumap-core test_name
+
+# Run tests for a single crate
+cargo test -p dumap-layout
+
 # Code quality
 cargo clippy --workspace --tests
 cargo fmt --all
 
 # Run
-cargo run -- view /path                            # Interactive GUI treemap
-cargo run -- scan /path [-o output.html] [--open]  # HTML export
-cargo run -- top /path [-n COUNT] [--files]         # CLI table output
+cargo run -- view [/path]                            # Interactive GUI treemap
+cargo run -- export [/path] [-o output.html] [--open]  # HTML export
 ```
 
 ## Key Architecture
 
 ### Crate Responsibilities
 
-- **dumap-core**: `DirNode` tree (HashMap-based), `FileTree` (arena-allocated), `EChartsNode` JSON conversion, `scan_directory()` using `ignore::WalkBuilder`, `generate_html()` ECharts template, `format_size()`, `find_largest()`, `FileCategory` for extension-based type classification
+- **dumap-core**: `DirNode` tree (HashMap-based), `FileTree` (arena-allocated), `EChartsNode` JSON conversion, `scan_directory()` using `ignore::WalkBuilder`, `generate_html()` ECharts template, `format_size()`, `FileCategory` for extension-based type classification
 - **dumap-layout**: Squarified treemap algorithm (`squarify_layout()`), `LayoutRect`, `LayoutEntry`, `TreemapLayout` with hit testing. Pure geometry, no I/O.
 - **dumap-gui**: egui/eframe interactive viewer with background scan, category-colored treemap, click-to-zoom, right-click-to-zoom-out, breadcrumb navigation, tooltips, depth slider
-- **dumap-cli**: `clap` CLI with `view` (launch GUI), `scan` (HTML treemap output), and `top` (table of largest entries) subcommands
+- **dumap-cli**: `clap` CLI with `view` (launch GUI) and `export` (HTML treemap output) subcommands. Path defaults to home directory if omitted.
 
 ### Scanning
 

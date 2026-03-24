@@ -2,7 +2,7 @@ use crate::error::ScanError;
 use crate::tree::{DirNode, split_path};
 use ignore::WalkBuilder;
 use parking_lot::RwLock;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use tracing::debug;
@@ -196,42 +196,5 @@ pub fn format_size(bytes: u64) -> String {
         format!("{:.1} KB", bytes as f64 / KB as f64)
     } else {
         format!("{} B", bytes)
-    }
-}
-
-/// Find the N largest entries (files or directories) in a tree.
-///
-/// Returns a list of (path, size) pairs sorted by size descending.
-pub fn find_largest(
-    root: &DirNode,
-    root_path: &Path,
-    count: usize,
-    files_only: bool,
-) -> Vec<(PathBuf, u64)> {
-    let mut results: Vec<(PathBuf, u64)> = Vec::new();
-    collect_entries(root, root_path, files_only, &mut results);
-    results.sort_by(|a, b| b.1.cmp(&a.1));
-    results.truncate(count);
-    results
-}
-
-fn collect_entries(
-    node: &DirNode,
-    current_path: &Path,
-    files_only: bool,
-    results: &mut Vec<(PathBuf, u64)>,
-) {
-    for (name, child) in &node.children {
-        let child_path = current_path.join(name);
-        if child.children.is_empty() {
-            // Leaf (file)
-            results.push((child_path, child.file_size));
-        } else {
-            // Directory
-            if !files_only {
-                results.push((child_path.clone(), child.total_size()));
-            }
-            collect_entries(child, &child_path, files_only, results);
-        }
     }
 }
