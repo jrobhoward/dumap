@@ -25,3 +25,7 @@ pub fn lighten(color: Color32, factor: f32) -> Color32 {
         (color.b() as f32 + (255.0 - color.b() as f32) * f) as u8,
     )
 }
+
+#[cfg(test)]
+#[path = "color_tests.rs"]
+mod color_tests;

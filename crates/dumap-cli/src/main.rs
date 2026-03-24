@@ -69,6 +69,10 @@ enum Command {
     },
 }
 
+#[cfg(test)]
+#[path = "main_tests.rs"]
+mod main_tests;
+
 fn main() {
     tracing_subscriber::fmt()
         .with_env_filter(

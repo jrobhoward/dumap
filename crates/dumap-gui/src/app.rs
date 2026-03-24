@@ -485,3 +485,7 @@ fn to_egui_rect(r: &dumap_layout::LayoutRect, origin: Pos2) -> Rect {
         Vec2::new(r.w as f32, r.h as f32),
     )
 }
+
+#[cfg(test)]
+#[path = "app_tests.rs"]
+mod app_tests;

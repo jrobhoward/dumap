@@ -582,6 +582,7 @@ dependencies = [
  "egui",
  "open",
  "serde_json",
+ "tempfile",
  "tracing",
  "tracing-subscriber",
 ]
