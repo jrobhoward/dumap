@@ -25,7 +25,7 @@ gui = ["dep:dumap-gui", "dep:eframe", "dep:egui"]
 [dependencies]
 dirs = "6"
 dumap-core = { workspace = true }
-dumap-gui = { path = "../dumap-gui", optional = true }
+dumap-gui = { path = "../dumap-gui", version = "1.0.0", optional = true }
 clap = { workspace = true }
 eframe = { workspace = true, optional = true }
 egui = { workspace = true, optional = true }

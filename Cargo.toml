@@ -14,6 +14,7 @@ rust-version = "1.88.0"
 license = "MIT OR Apache-2.0"
 authors = ["James Howard <jrobhoward@gmail.com>"]
 repository = "https://github.com/jrobhoward/dumap"
+homepage = "https://github.com/jrobhoward/dumap"
 readme = "README.md"
 keywords = ["disk-usage", "treemap", "visualization", "filesystem"]
 categories = ["command-line-utilities", "filesystem", "visualization"]
@@ -25,8 +26,8 @@ expect_used = "warn"
 
 [workspace.dependencies]
 # Internal crates
-dumap-core = { path = "crates/dumap-core" }
-dumap-layout = { path = "crates/dumap-layout" }
+dumap-core = { path = "crates/dumap-core", version = "1.0.0" }
+dumap-layout = { path = "crates/dumap-layout", version = "1.0.0" }
 
 # CLI
 clap = { version = "4", features = ["derive"] }
