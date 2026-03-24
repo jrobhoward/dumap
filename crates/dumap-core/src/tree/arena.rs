@@ -85,16 +85,21 @@ impl FileTree {
         }
     }
 
-    /// Build the full path for a node by walking up to root.
+    /// Build the relative path for a node by walking up to (but excluding) the root.
+    ///
+    /// The root node represents `scan_root` itself, so it is excluded to avoid
+    /// duplication when callers do `scan_root.join(path(...))`.
     pub fn path(&self, id: NodeId) -> PathBuf {
         let mut components = Vec::new();
         let mut current = id;
         loop {
             let node = self.node(current);
-            components.push(node.name.as_str());
             match node.parent {
-                Some(parent) => current = parent,
-                None => break,
+                Some(parent) => {
+                    components.push(node.name.as_str());
+                    current = parent;
+                }
+                None => break, // skip root node
             }
         }
         components.reverse();

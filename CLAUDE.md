@@ -16,7 +16,7 @@ dumap/
 │   ├── dumap-core/     # Tree construction, filesystem scanning, HTML generation, FileTree arena
 │   ├── dumap-layout/   # Squarified treemap layout algorithm (pure geometry)
 │   ├── dumap-gui/      # Interactive egui treemap viewer
-│   └── dumap-cli/      # CLI binary (scan, view, top subcommands)
+│   └── dumap-cli/      # CLI binary (export, view subcommands)
 └── clippy.toml           # allow-unwrap-in-tests = true
 ```
 
