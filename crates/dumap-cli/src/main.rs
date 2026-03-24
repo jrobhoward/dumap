@@ -173,8 +173,7 @@ fn run_export(
 
     if open_browser {
         let abs_output = std::fs::canonicalize(&output)?;
-        let url = format!("file://{}", abs_output.display());
-        if let Err(err) = open::that(&url) {
+        if let Err(err) = open::that(abs_output.as_os_str()) {
             eprintln!("Failed to open browser: {err}");
         }
     }
