@@ -4,23 +4,23 @@ A cross-platform disk usage visualizer that scans directories and generates inte
 
 dumap provides two ways to explore disk usage:
 
+- **`view`** (default) -- opens a native GUI window with a real-time treemap powered by [egui](https://github.com/emilk/egui), featuring click-to-zoom, breadcrumb navigation, and category-colored file types
 - **`export`** -- generates a self-contained HTML file with an interactive [ECharts](https://echarts.apache.org/) treemap you can open in any browser
-- **`view`** -- opens a native GUI window with a real-time treemap powered by [egui](https://github.com/emilk/egui), featuring click-to-zoom, breadcrumb navigation, and category-colored file types
 
-### Native GUI (`dumap view`)
+### Native GUI (`dumap` / `dumap view`)
 
-![Native GUI viewer](assets/view.png)
+![Native GUI viewer](https://raw.githubusercontent.com/jrobhoward/dumap/main/assets/view.png)
 
 ### HTML export (`dumap export`)
 
-![HTML export](assets/export.png)
+![HTML export](https://raw.githubusercontent.com/jrobhoward/dumap/main/assets/export.png)
 
 ## Install
 
 ### From crates.io
 
 ```sh
-cargo install dumap-cli
+cargo install dumap
 ```
 
 This installs the `dumap` binary with the native GUI enabled by default.
@@ -43,6 +43,12 @@ The binary will be at `target/release/dumap`.
 
 ## Usage
 
+Running `dumap` with no arguments launches the GUI viewer on your home directory:
+
+```sh
+dumap
+```
+
 ### Interactive GUI viewer
 
 ```sh
@@ -50,12 +56,6 @@ dumap view ~/projects
 ```
 
 Scans the directory and opens a native window with a zoomable treemap. Click a directory to zoom in, right-click or scroll down to zoom out. A depth slider and breadcrumb bar are provided for navigation.
-
-If no path is given, it defaults to your home directory:
-
-```sh
-dumap view
-```
 
 ### HTML export
 
@@ -72,7 +72,7 @@ Scans the directory and writes a self-contained HTML treemap. The `--open` flag 
 | Option | Description |
 |--------|-------------|
 | `[PATH]` | Directory to scan. Defaults to your home directory if omitted. |
-| `--include-hidden` | Include hidden files and directories in the scan. By default, any file or directory whose name starts with `.` is skipped entirely -- hidden directories like `.git/`, `.cache/`, and `.config/` are never entered, so their contents are excluded too. |
+| `--exclude-hidden` | Exclude hidden files and directories from the scan. By default, all files are included -- hidden directories like `.git/`, `.cache/`, and `.config/` are scanned along with everything else. |
 | `--apparent-size` | Report logical file sizes instead of actual disk usage. By default, dumap uses disk usage (block-allocated size on Unix), which reflects how much space files actually consume on disk. Apparent size is the byte count written to the file, which can be smaller (sparse files) or simply different due to filesystem block alignment. |
 
 #### `export` only
@@ -87,14 +87,20 @@ Scans the directory and writes a self-contained HTML treemap. The `--open` flag 
 ### Examples
 
 ```sh
+# Launch GUI on home directory (default)
+dumap
+
+# Launch GUI on a specific directory
+dumap view ~/projects/myapp
+
 # Export your home directory with default settings
 dumap export
 
 # Export /usr with 5 depth levels, open in browser
 dumap export /usr -d 5 --open
 
-# View a project directory, including hidden files
-dumap view ~/projects/myapp --include-hidden
+# View a project directory, excluding hidden files
+dumap view ~/projects/myapp --exclude-hidden
 
 # Export with apparent sizes instead of disk usage
 dumap export /var/log --apparent-size -o logs.html

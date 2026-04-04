@@ -101,7 +101,7 @@ fn run_export____apparent_size_flag____succeeds() {
 }
 
 #[test]
-fn run_export____include_hidden____succeeds() {
+fn run_export____with_hidden_files____succeeds() {
     let tmp = TempDir::new().unwrap();
     let scan_dir = tmp.path().join("data");
     fs::create_dir(&scan_dir).unwrap();

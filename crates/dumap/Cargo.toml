@@ -1,0 +1,22 @@
+[package]
+name = "dumap"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+readme = "../../README.md"
+keywords.workspace = true
+categories.workspace = true
+description = "Interactive disk usage treemap visualizer — scan directories and explore space usage with a native GUI or HTML export"
+
+[[bin]]
+name = "dumap"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+dumap-cli = { workspace = true }

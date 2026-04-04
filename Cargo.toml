@@ -5,10 +5,11 @@ members = [
     "crates/dumap-layout",
     "crates/dumap-gui",
     "crates/dumap-cli",
+    "crates/dumap",
 ]
 
 [workspace.package]
-version = "1.0.0"
+version = "1.1.0"
 edition = "2024"
 rust-version = "1.88.0"
 license = "MIT OR Apache-2.0"
@@ -26,8 +27,9 @@ expect_used = "warn"
 
 [workspace.dependencies]
 # Internal crates
-dumap-core = { path = "crates/dumap-core", version = "1.0.0" }
-dumap-layout = { path = "crates/dumap-layout", version = "1.0.0" }
+dumap-cli = { path = "crates/dumap-cli", version = "1.1.0" }
+dumap-core = { path = "crates/dumap-core", version = "1.1.0" }
+dumap-layout = { path = "crates/dumap-layout", version = "1.1.0" }
 
 # CLI
 clap = { version = "4", features = ["derive"] }

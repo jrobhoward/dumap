@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-dumap is a cross-platform disk usage visualizer that scans directories and generates interactive treemap visualizations. Phase 1 outputs self-contained HTML files using ECharts; Phase 2 will add a native GUI via egui.
+dumap is a cross-platform disk usage visualizer that scans directories and generates interactive treemap visualizations. It has two output modes: self-contained HTML files using ECharts (`export`) and a native GUI via egui (`view`).
 
 **Rust Requirements**: Edition 2024, rust-version 1.88.0
 
@@ -13,14 +13,20 @@ dumap is a cross-platform disk usage visualizer that scans directories and gener
 ```
 dumap/
 ├── crates/
+│   ├── dumap/          # Facade crate (cargo install dumap)
 │   ├── dumap-core/     # Tree construction, filesystem scanning, HTML generation, FileTree arena
 │   ├── dumap-layout/   # Squarified treemap layout algorithm (pure geometry)
 │   ├── dumap-gui/      # Interactive egui treemap viewer
-│   └── dumap-cli/      # CLI binary (export, view subcommands)
+│   └── dumap-cli/      # CLI library + binary (export, view subcommands)
 └── clippy.toml           # allow-unwrap-in-tests = true
 ```
 
 ## Build Commands
+
+**Linux prerequisites** (needed for the GUI/egui crate):
+```bash
+sudo apt-get install -y libxkbcommon-dev libgtk-3-dev
+```
 
 ```bash
 # Build
@@ -39,9 +45,11 @@ cargo test -p dumap-layout
 # Code quality
 cargo clippy --workspace --tests
 cargo fmt --all
+cargo deny check            # license, advisory, ban, source checks (run in CI)
 
 # Run
-cargo run -- view [/path]                            # Interactive GUI treemap
+cargo run -- [/path]                                   # Interactive GUI treemap (default)
+cargo run -- view [/path]                              # Explicit GUI treemap
 cargo run -- export [/path] [-o output.html] [--open]  # HTML export
 ```
 
@@ -52,7 +60,8 @@ cargo run -- export [/path] [-o output.html] [--open]  # HTML export
 - **dumap-core**: `DirNode` tree (HashMap-based), `FileTree` (arena-allocated), `EChartsNode` JSON conversion, `scan_directory()` using `ignore::WalkBuilder`, `generate_html()` ECharts template, `format_size()`, `FileCategory` for extension-based type classification
 - **dumap-layout**: Squarified treemap algorithm (`squarify_layout()`), `LayoutRect`, `LayoutEntry`, `TreemapLayout` with hit testing. Pure geometry, no I/O.
 - **dumap-gui**: egui/eframe interactive viewer with background scan, category-colored treemap, click-to-zoom, right-click-to-zoom-out, breadcrumb navigation, tooltips, depth slider
-- **dumap-cli**: `clap` CLI with `view` (launch GUI) and `export` (HTML treemap output) subcommands. Path defaults to home directory if omitted.
+- **dumap**: Facade crate — thin wrapper so `cargo install dumap` works. Calls `dumap_cli::run()`.
+- **dumap-cli**: `clap` CLI with `view` (launch GUI, default) and `export` (HTML treemap output) subcommands. Exposes `lib.rs` with `run()` entry point. Path defaults to home directory if omitted.
 
 ### Scanning
 
@@ -84,6 +93,7 @@ Self-contained HTML with ECharts CDN. Features: squarified treemap, `leafDepth: 
 - `unwrap_used = "warn"`
 - `expect_used = "warn"`
 - `cognitive_complexity = "warn"`
+- CI sets `RUSTFLAGS: -Dwarnings`, so all warnings become errors in CI
 
 ### Testing
 - Tests in separate `*_tests.rs` files

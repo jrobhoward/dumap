@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-04-03
+
+### Added
+
+- **`dumap` facade crate** — `cargo install dumap` now works directly, instead of
+  requiring `cargo install dumap-cli`.
+- **Default subcommand** — running `dumap` with no arguments launches the GUI
+  viewer on your home directory. No subcommand required for the most common
+  workflow.
+
+### Changed
+
+- **Hidden files included by default** — all files (including `.git/`, `.cache/`,
+  etc.) are now scanned by default, giving an accurate picture of total disk
+  usage. Use `--exclude-hidden` to opt out. The previous `--include-hidden` flag
+  has been removed.
+- The `view` subcommand is now the default; `export` remains available as an
+  explicit subcommand.
+
 ## [1.0.0] - 2026-03-23
 
 ### Added

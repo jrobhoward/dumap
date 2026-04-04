@@ -11,6 +11,10 @@ keywords.workspace = true
 categories.workspace = true
 description = "CLI tool for dumap: scan directories and visualize disk usage as interactive treemaps"
 
+[lib]
+name = "dumap_cli"
+path = "src/lib.rs"
+
 [[bin]]
 name = "dumap"
 path = "src/main.rs"
@@ -25,7 +29,7 @@ gui = ["dep:dumap-gui", "dep:eframe", "dep:egui"]
 [dependencies]
 dirs = "6"
 dumap-core = { workspace = true }
-dumap-gui = { path = "../dumap-gui", version = "1.0.0", optional = true }
+dumap-gui = { path = "../dumap-gui", version = "1.1.0", optional = true }
 clap = { workspace = true }
 eframe = { workspace = true, optional = true }
 egui = { workspace = true, optional = true }
