@@ -18,5 +18,9 @@ path = "src/main.rs"
 [lints]
 workspace = true
 
+[features]
+default = ["gui"]
+gui = ["dumap-cli/gui"]
+
 [dependencies]
-dumap-cli = { workspace = true }
+dumap-cli = { workspace = true, default-features = false }

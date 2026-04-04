@@ -59,7 +59,7 @@ cargo install dumap
 To install without the GUI (HTML export only):
 
 ```sh
-cargo install dumap-cli --no-default-features
+cargo install dumap --no-default-features
 ```
 
 ### Build from source

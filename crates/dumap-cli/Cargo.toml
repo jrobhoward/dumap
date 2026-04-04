@@ -15,10 +15,6 @@ description = "CLI tool for dumap: scan directories and visualize disk usage as 
 name = "dumap_cli"
 path = "src/lib.rs"
 
-[[bin]]
-name = "dumap"
-path = "src/main.rs"
-
 [lints]
 workspace = true
 

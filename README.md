@@ -28,7 +28,7 @@ This installs the `dumap` binary with the native GUI enabled by default.
 To install without the GUI (HTML export only):
 
 ```sh
-cargo install dumap-cli --no-default-features
+cargo install dumap --no-default-features
 ```
 
 ### From source
