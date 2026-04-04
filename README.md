@@ -9,7 +9,7 @@ dumap provides two ways to explore disk usage:
 
 ### Native GUI (`dumap` / `dumap view`)
 
-![Native GUI viewer](https://raw.githubusercontent.com/jrobhoward/dumap/main/assets/view.png)
+![Native GUI viewer](https://raw.githubusercontent.com/jrobhoward/dumap/main/assets/dumap_screencast.gif)
 
 ### HTML export (`dumap export`)
 

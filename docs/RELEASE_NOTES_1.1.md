@@ -10,11 +10,15 @@
 
 ### Native GUI
 
-![Native GUI viewer](https://raw.githubusercontent.com/jrobhoward/dumap/main/assets/view.png)
+![Native GUI viewer](https://raw.githubusercontent.com/jrobhoward/dumap/main/assets/dumap_screencast.gif)
 
 ### HTML export
 
 ![HTML export](https://raw.githubusercontent.com/jrobhoward/dumap/main/assets/export.png)
+
+## File Categories
+
+Files are color-coded by type in both the GUI and HTML views, making it easy to spot what's consuming space at a glance — large clusters of video files, build artifacts, cached dependencies, etc. Categories include Code, Image, Video, Audio, Archive, Document, Database, Executable, Font, Config, Data, and Other.
 
 ## What's New in 1.1
 
